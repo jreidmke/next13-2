@@ -7,9 +7,13 @@ import fetcher from "../utils/fetchMessages";
 
 export default function ChatInput() {
     const [input, setInput] = useState("");
-    const { data, error, mutate } = useSWR(`/api/getMessages`, fetcher);
+    const {
+        data: messages,
+        error,
+        mutate,
+    } = useSWR(`/api/getMessages`, fetcher);
 
-    const addMessage = (e: FormEvent<HTMLFormElement>) => {
+    const addMessage = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (!input) return;
         const messageToSend = input;
@@ -24,18 +28,22 @@ export default function ChatInput() {
             profilePic: "https://links.papareact.com/jne",
             email: "jreidmke@gmail.com",
         };
+
         const uploadMsgToUpstash = async () => {
-            const res = await fetch(`/api/addMessage`, {
+            const data = await fetch(`/api/addMessage`, {
                 method: "POST",
                 headers: {
                     "Content-type": "application/json",
                 },
                 body: JSON.stringify({ message }),
-            });
-            const data = await res.json();
+            }).then((r) => r.json());
+            return [data.message, ...messages!];
         };
 
-        uploadMsgToUpstash();
+        await mutate(uploadMsgToUpstash, {
+            optimisticData: [message, ...messages!],
+            rollbackOnError: true,
+        });
     };
 
     return (
