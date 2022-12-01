@@ -49,7 +49,7 @@ export default function ChatInput() {
     return (
         <form
             onSubmit={addMessage}
-            className="fixed bottom-0 z-50 w-full flex px-10 py-5 space-x-2 border-t border-gray-100"
+            className="fixed bottom-0 z-50 w-full flex px-10 py-5 space-x-2 border-t border-gray-100 bg-white "
         >
             <input
                 type="text"
